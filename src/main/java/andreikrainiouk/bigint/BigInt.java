@@ -5,10 +5,15 @@ import java.util.List;
 
 public class BigInt {
 
+    //Fields////////////////////////////////////////////////////////////////////////////////////////
+
     //ArrayList representation of a natural number
     private final List<Integer> value;
     //Denotes sign
+
     private final boolean positive;
+
+    //Constructors//////////////////////////////////////////////////////////////////////////////////
 
     //Constructor from list
     public BigInt(List<Integer> value, boolean positive) {
@@ -31,6 +36,8 @@ public class BigInt {
         }
     }
 
+    //Private Methods///////////////////////////////////////////////////////////////////////////////
+
     //Helper for constructor, converts positive integer into ArrayList
     private List<Integer> toList(int value) {
         List<Integer> newList = new ArrayList<Integer>();
@@ -41,7 +48,7 @@ public class BigInt {
     }
 
     //Creates copy of given BigInt with opposite sign
-    public BigInt negCopy() {
+    private BigInt negCopy() {
         int thisValue = 0;
         for (int i = 0; i < this.value.size(); i++) {
             thisValue += this.value.get(i) * IntHelper.intPow(10, i);
@@ -50,16 +57,40 @@ public class BigInt {
         else return new BigInt(thisValue);
     }
 
-    //Prints out BigInt
-    public String toString() {
-        if (value.isEmpty()) return "0";
-        StringBuilder output = new StringBuilder();
-        if (!positive) output.append("-");
-        for (int i = value.size(); i > 0; i--) {
-            output.append(value.get(i - 1));
+    //Called by add and subtract, actual code that calculates sums
+    private BigInt sum(BigInt that) {
+        int carry = 0;
+        List<Integer> total = new ArrayList<Integer>();
+        //For same sign sum
+        if ((this.positive && that.positive) || (!this.positive && !that.positive)){
+            for (int i = 0; i < this.value.size(); i++){
+                //When processing digits only in this
+                if (i >= that.value.size()) {
+                    int sum = this.value.get(i) + carry;
+                    assert ((sum % 10 < 10) && (sum % 10 >= 0));
+                    total.add(sum % 10);
+                    carry = sum / 10;
+                    //When processing digits existing in both this and that
+                } else {
+                    int sum = this.value.get(i) + that.value.get(i) + carry;
+                    total.add(sum % 10);
+                    carry = sum / 10;
+                }
+            }
+            if (carry != 0) {
+                assert (carry > 0);
+                assert (carry < 10);
+                total.add(carry);
+            }
+            if (this.positive) return new BigInt(total, true);
+            else return new BigInt(total, false);
+            //For opposite sign sums
+        } else {
+            return this;
         }
-        return output.toString();
     }
+
+    //Public Methods////////////////////////////////////////////////////////////////////////////////
 
     //Compares 2 BigInts, returns -1 for this < that, 0 for this = that, and 1 for this > that,
     //and 2 for error
@@ -96,7 +127,18 @@ public class BigInt {
         } else return 2;
     }
 
-    //Externally called add function, runs sum function for largerInput.sum(smallerInput), compares
+    //Prints out BigInt
+    public String toString() {
+        if (value.isEmpty()) return "0";
+        StringBuilder output = new StringBuilder();
+        if (!positive) output.append("-");
+        for (int i = value.size(); i > 0; i--) {
+            output.append(value.get(i - 1));
+        }
+        return output.toString();
+    }
+
+    //Externally called add method, runs sum method for largerInput.sum(smallerInput), compares
     //digit length first
     public BigInt add(BigInt that) {
         if (this.compareBigInt(that) == 0) return this.multiply(2);
@@ -106,44 +148,12 @@ public class BigInt {
         else return that.sum(this);
     }
 
-    //Externally called subtraction function
+    //Externally called subtraction method
     public BigInt subtract(BigInt that) {
         return this.add(that.negCopy());
     }
 
-    //Called by add and subtract, actual code that calculates sums
-    private BigInt sum(BigInt that) {
-        int carry = 0;
-        List<Integer> total = new ArrayList<Integer>();
-        //For same sign sum
-        if ((this.positive && that.positive) || (!this.positive && !that.positive)){
-            for (int i = 0; i < this.value.size(); i++){
-                //When processing digits only in this
-                if (i >= that.value.size()) {
-                    int sum = this.value.get(i) + carry;
-                    assert ((sum % 10 < 10) && (sum % 10 >= 0));
-                    total.add(sum % 10);
-                    carry = sum / 10;
-                //When processing digits existing in both this and that
-                } else {
-                    int sum = this.value.get(i) + that.value.get(i) + carry;
-                    total.add(sum % 10);
-                    carry = sum / 10;
-                }
-            }
-            if (carry != 0) {
-                assert (carry > 0);
-                assert (carry < 10);
-                total.add(carry);
-            }
-            if (this.positive) return new BigInt(total, true);
-            else return new BigInt(total, false);
-        //For opposite sign sums
-        } else {
-            return this;
-        }
-    }
-
+    //Externally called multiplication method
     public BigInt multiply(int factor) {
         return this;
     }
