@@ -51,12 +51,14 @@ public class BigInt {
     }
 
     //Prints out BigInt
-    public void printBigInt() {
-        if (!positive) System.out.print("-");
+    public String toString() {
+        if (value.isEmpty()) return "0";
+        StringBuilder output = new StringBuilder();
+        if (!positive) output.append("-");
         for (int i = value.size(); i > 0; i--) {
-            System.out.print(value.get(i - 1));
+            output.append(value.get(i - 1));
         }
-        System.out.println();
+        return output.toString();
     }
 
     //Compares 2 BigInts, returns -1 for this < that, 0 for this = that, and 1 for this > that,
@@ -87,16 +89,19 @@ public class BigInt {
                 //Digit by digit comparison
                 for (int i = this.value.size() - 1; i >= 0; i--) {
                     if (this.value.get(i) < that.value.get(i)) return 1;
-                    else if (this.value.get(i) < that.value.get(i)) return -1;
+                    else if (this.value.get(i) > that.value.get(i)) return -1;
                 }
                 return 0;
             }
         } else return 2;
     }
 
-    //Externally called add function, runs sum function for largerInput.sum(smallerInput)
+    //Externally called add function, runs sum function for largerInput.sum(smallerInput), compares
+    //digit length first
     public BigInt add(BigInt that) {
         if (this.compareBigInt(that) == 0) return this.multiply(2);
+        else if (this.value.size() > that.value.size()) return this.sum(that);
+        else if (this.value.size() < that.value.size()) return that.sum(this);
         else if (this.compareBigInt(that) == 1) return this.sum(that);
         else return that.sum(this);
     }
@@ -114,21 +119,21 @@ public class BigInt {
         if ((this.positive && that.positive) || (!this.positive && !that.positive)){
             for (int i = 0; i < this.value.size(); i++){
                 //When processing digits only in this
-                if (i > that.value.size()) {
+                if (i >= that.value.size()) {
                     int sum = this.value.get(i) + carry;
                     assert ((sum % 10 < 10) && (sum % 10 >= 0));
                     total.add(sum % 10);
-                    carry = sum - (sum % 10);
+                    carry = sum / 10;
                 //When processing digits existing in both this and that
                 } else {
                     int sum = this.value.get(i) + that.value.get(i) + carry;
-                    assert ((sum % 10 < 10) && (sum % 10 >= 0));
                     total.add(sum % 10);
-                    carry = sum - (sum % 10);
+                    carry = sum / 10;
                 }
             }
             if (carry != 0) {
                 assert (carry > 0);
+                assert (carry < 10);
                 total.add(carry);
             }
             if (this.positive) return new BigInt(total, true);
