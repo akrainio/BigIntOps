@@ -47,16 +47,6 @@ public class BigInt {
         return newList;
     }
 
-    //Creates copy of given BigInt with opposite sign
-    private BigInt negCopy() {
-        int thisValue = 0;
-        for (int i = 0; i < this.value.size(); i++) {
-            thisValue += this.value.get(i) * IntHelper.intPow(10, i);
-        }
-        if (this.positive) return new BigInt(thisValue * -1);
-        else return new BigInt(thisValue);
-    }
-
     //Called by add and subtract, actual code that calculates sums
     private BigInt sum(BigInt that) {
         int carry = 0;
@@ -88,6 +78,18 @@ public class BigInt {
         } else {
             return this;
         }
+    }
+
+    //Package private
+
+    //Creates copy of given BigInt with opposite sign
+    BigInt negCopy() {
+        int thisValue = 0;
+        for (int i = 0; i < this.value.size(); i++) {
+            thisValue += this.value.get(i) * IntHelper.intPow(10, i);
+        }
+        if (this.positive) return new BigInt(thisValue * -1);
+        else return new BigInt(thisValue);
     }
 
     //Public Methods////////////////////////////////////////////////////////////////////////////////
