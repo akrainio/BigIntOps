@@ -97,6 +97,7 @@ public class BigInt {
     //Compares 2 BigInts, returns -1 for this < that, 0 for this = that, and 1 for this > that,
     //and 2 for error
     public int compareBigInt(BigInt that) {
+        //only needs less than and equals to operators for C++ implementation
         //Cases for opposite signs
         if (this.positive && !that.positive) return 1;
         if (!this.positive && that.positive) return -1;

@@ -25,6 +25,7 @@ public class IntHelper {
 
     //Used to determine the digit at a given location of an integer
     public static int getDigitAt (int value, int loc) {
+        //c++ code: d1 = i < v.size() ? v[i] : 0;
         assert (loc >= 0);
         assert (loc < numDigits(value));
         return ((value % (intPow(10, (loc + 1)))) - (value % (intPow(10, loc))))/(intPow(10, loc));
