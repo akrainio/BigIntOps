@@ -11,6 +11,7 @@ public class BigInt {
     private final List<Integer> value;
     //Denotes sign
 
+
     private final boolean positive;
 
     //Constructors//////////////////////////////////////////////////////////////////////////////////
@@ -47,37 +48,55 @@ public class BigInt {
         return newList;
     }
 
-    //Called by add and subtract, actual code that calculates sums
-    private BigInt sum(BigInt that) {
+    //Removes leading zeroes from ArrayList
+    private void trim(List<Integer> value) {
+        while (true) {
+            if (value.get(value.size() - 1) == 0) value.remove(value.size() - 1);
+            else break;
+        }
+    }
+
+    //Called by add, calculates sum of two positive BigInts, where the first has a
+    //higher magnitude than the second
+    private BigInt uAdd(BigInt that) {
         int carry = 0;
         List<Integer> total = new ArrayList<Integer>();
-        //For same sign sum
-        if ((this.positive && that.positive) || (!this.positive && !that.positive)){
-            for (int i = 0; i < this.value.size(); i++){
-                //When processing digits only in this
-                if (i >= that.value.size()) {
-                    int sum = this.value.get(i) + carry;
-                    assert ((sum % 10 < 10) && (sum % 10 >= 0));
-                    total.add(sum % 10);
-                    carry = sum / 10;
-                    //When processing digits existing in both this and that
-                } else {
-                    int sum = this.value.get(i) + that.value.get(i) + carry;
-                    total.add(sum % 10);
-                    carry = sum / 10;
-                }
+        for (int i = 0; i < this.value.size(); i++){
+            //When processing digits only in this
+            if (i >= that.value.size()) {
+                int sum = this.value.get(i) + carry;
+                total.add(sum % 10);
+                carry = sum / 10;
+            //When processing digits existing in both this and that
+            } else {
+                int sum = this.value.get(i) + that.value.get(i) + carry;
+                total.add(sum % 10);
+                carry = sum / 10;
             }
-            if (carry != 0) {
-                assert (carry > 0);
-                assert (carry < 10);
-                total.add(carry);
-            }
-            if (this.positive) return new BigInt(total, true);
-            else return new BigInt(total, false);
-            //For opposite sign sums
-        } else {
-            return this;
         }
+        if (carry != 0) {
+            assert (carry > 0);
+            assert (carry < 10);
+            total.add(carry);
+        }
+        return new BigInt(total, true);
+    }
+
+    //Called by add, calculates difference between two positive BigInts, where the first has
+    //a higher magnitude than the second
+    private BigInt uSub(BigInt that) {
+        List<Integer> total = new ArrayList<Integer>();
+        int carry = 0;
+        for (int i = 0; i < this.value.size(); ++i) {
+            int sum = this.value.get(i) + 10 - carry;
+            if (i < that.value.size()) sum -= that.value.get(i);
+            if (sum < 10) carry = 1;
+            else carry = 0;
+            sum = sum % 10;
+            total.add(sum);
+        }
+        trim(total);
+        return new BigInt(total, true);
     }
 
     //Package private
@@ -108,7 +127,7 @@ public class BigInt {
             else if (this.value.size() < that.value.size()) return -1;
             else {
                 //Digit by digit comparison
-                for (int i = this.value.size() - 1; i >= 0; i++) {
+                for (int i = this.value.size() - 1; i >= 0; --i) {
                     if (this.value.get(i) > that.value.get(i)) return 1;
                     else if (this.value.get(i) < that.value.get(i)) return -1;
                 }
@@ -130,6 +149,20 @@ public class BigInt {
         } else return 2;
     }
 
+    //Tests expression (|this| > |that|)
+    boolean higherMagnitude(BigInt that) {
+        if (this.value.size() > that.value.size()) return true;
+        else if (this.value.size() < that.value.size()) return false;
+        else {
+            //Digit by digit comparison
+            for (int i = this.value.size() - 1; i >= 0; --i) {
+                if (this.value.get(i) > that.value.get(i)) return true;
+                else if (this.value.get(i) < that.value.get(i)) return false;
+            }
+            return false;
+        }
+    }
+
     //Prints out BigInt
     public String toString() {
         if (value.isEmpty()) return "0";
@@ -144,20 +177,40 @@ public class BigInt {
     //Externally called add method, runs sum method for largerInput.sum(smallerInput), compares
     //digit length first
     public BigInt add(BigInt that) {
-        if (this.compareBigInt(that) == 0) return this.multiply(2);
-        else if (this.value.size() > that.value.size()) return this.sum(that);
-        else if (this.value.size() < that.value.size()) return that.sum(this);
-        else if (this.compareBigInt(that) == 1) return this.sum(that);
-        else return that.sum(this);
+        //If a == b: a.multiply(2)
+        if (this.compareBigInt(that) == 0) return this.uAdd(this);
+        //If |a| == |b|: 0
+        if (this.compareBigInt(that.negCopy()) == 0) return new BigInt(0);
+        //If both pos: a.uAdd(b)
+        if (this.positive && that.positive) return this.uAdd(that);
+        //if both neg: -|a|.uAdd(|b|)
+        if (!this.positive && !that.positive) return this.uAdd(that).negCopy();
+        //If (a) neg larger than (b) pos: -|a|.uSub(|b|)
+        if (this.higherMagnitude(that) && !this.positive) return (this.uSub(that)).negCopy();
+        //If (a) pos smaller than (b) neg: -|b|.uSub(|a|)
+        if (that.higherMagnitude(this) && !that.positive) return (that.uSub(this)).negCopy();
+        //If (a) pos larger than (b) neg: |a|.uSub(|b|)
+        if (this.higherMagnitude(that) && this.positive) return this.uSub(that);
+        //If (a) neg smaller than (b) pos: |b|.uSub(|a|)
+        if (that.higherMagnitude(this) && that.positive) return that.uSub(this);
+        else {
+            System.err.println("BigInt.add():: Bad code");
+            return new BigInt(0);
+        }
     }
 
-    //Externally called subtraction method
-    public BigInt subtract(BigInt that) {
+    //Externally called subtraction method operating on an int and a BigInt
+    public BigInt sub(BigInt that) {
         return this.add(that.negCopy());
     }
 
     //Externally called multiplication method
     public BigInt multiply(int factor) {
+        return this;
+    }
+
+    //Externally called multiplication method operating on two BigInts
+    public BigInt multiply(BigInt that) {
         return this;
     }
 }
