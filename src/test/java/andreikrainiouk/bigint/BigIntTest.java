@@ -5,10 +5,10 @@ import org.junit.Test;
 import java.util.ArrayList;
 import java.util.List;
 
-import static andreikrainiouk.bigint.BigInt.trim;
 import static org.junit.Assert.*;
 
 public class BigIntTest {
+
     @Test
     public void testPrintBigInt() {
         BigInt num1 = new BigInt(1234);
@@ -30,14 +30,6 @@ public class BigIntTest {
         assertEquals("3210", temp.toString());
     }
 
-    @Test
-    public void testTrim() {
-        List<Integer> test = new ArrayList<Integer>();
-        test.add(0);
-        trim(test);
-        BigInt trimmed = new BigInt(test, true);
-        assertEquals("0", trimmed.toString());
-    }
     @Test
     public void testNegCopy() {
         BigInt num1 = new BigInt(-13);
@@ -151,7 +143,7 @@ public class BigIntTest {
         num1 = new BigInt(-99);
         num2 = new BigInt(-1);
         num3 = num1.add(num2);
-        //assertEquals("-100", num3.toString());
+        assertEquals("-100", num3.toString());
         num1 = new BigInt(-9);
         num2 = new BigInt(-8);
         num3 = num1.add(num2);
