@@ -222,6 +222,10 @@ class BigInt {
 
     //Externally called multiplication method operating on two BigInts
     public BigInt multiply(BigInt that) {
+        if ((this.value.size() == 1 && that.value.get(0) == 0) ||
+                (that.value.size() == 1 && that.value.get(0) == 0)) {
+            return new BigInt(0);
+        }
         if (this.positive == that.positive) {
             //Same sign multiplication
             return this.product(that);

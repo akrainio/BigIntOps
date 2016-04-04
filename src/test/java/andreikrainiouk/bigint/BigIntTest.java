@@ -199,6 +199,14 @@ public class BigIntTest {
         num2 = new BigInt(5);
         num3 = num1.sub(num2);
         assertEquals("-5", num3.toString());
+        num1 = new BigInt(5);
+        num2 = new BigInt(5);
+        num3 = num1.sub(num2);
+        assertEquals("0", num3.toString());
+        num1 = new BigInt(-5);
+        num2 = new BigInt(-5);
+        num3 = num1.sub(num2);
+        assertEquals("0", num3.toString());
     }
 
     @Test
@@ -207,6 +215,7 @@ public class BigIntTest {
         assertEquals("-2", ((new BigInt(1)).multiply(new BigInt(-2))).toString());
         assertEquals("0", ((new BigInt(2)).multiply(new BigInt(0))).toString());
         assertEquals("1156672", ((new BigInt(-1984)).multiply(new BigInt(-583))).toString());
+        assertEquals("0", ((new BigInt(-1984)).multiply(new BigInt(0))).toString());
         assertEquals("-4", ((new BigInt(2)).multiply(-2)).toString());
         assertEquals("-2", ((new BigInt(1)).multiply(-2)).toString());
         assertEquals("0", ((new BigInt(2)).multiply(0)).toString());
