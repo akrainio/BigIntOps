@@ -1,9 +1,12 @@
 package andreikrainiouk.bigint;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
-public class BigInt {
+import static java.util.Collections.unmodifiableList;
+
+class BigInt {
 
     //Fields////////////////////////////////////////////////////////////////////////////////////////
 
@@ -17,17 +20,13 @@ public class BigInt {
     //Constructors//////////////////////////////////////////////////////////////////////////////////
 
     //Constructor from list
-    public BigInt(List<Integer> value, boolean positive) {
-        if (!positive) {
-            this.positive = false;
-        } else {
-            this.positive = true;
-        }
+    BigInt(List<Integer> value, boolean positive) {
+        this.positive = positive;
         this.value = value;
     }
 
     //Constructor from int
-    public BigInt(int value) {
+    BigInt(int value) {
         if (value < 0) {
             positive = false;
             this.value = toList(value * -1);
@@ -49,10 +48,9 @@ public class BigInt {
     }
 
     //Removes leading zeroes from ArrayList
-    private void trim(List<Integer> value) {
-        while (true) {
-            if (value.get(value.size() - 1) == 0) value.remove(value.size() - 1);
-            else break;
+    static void trim(List<Integer> value) {
+        while (!value.isEmpty()&& value.get(value.size() - 1) == 0 && value.size() != 1) {
+            value.remove(value.size() - 1);
         }
     }
 
@@ -99,29 +97,28 @@ public class BigInt {
         return new BigInt(total, true);
     }
 
+    //Called by multiply, computes product of two positive BigInts
+    private BigInt product(BigInt that) {
+        return that;
+    }
     //Package private
 
     //Creates copy of given BigInt with opposite sign
     BigInt negCopy() {
-        int thisValue = 0;
-        for (int i = 0; i < this.value.size(); i++) {
-            thisValue += this.value.get(i) * IntHelper.intPow(10, i);
-        }
-        if (this.positive) return new BigInt(thisValue * -1);
-        else return new BigInt(thisValue);
+        return new BigInt(this.value, !this.positive);
     }
 
     //Public Methods////////////////////////////////////////////////////////////////////////////////
 
     //Compares 2 BigInts, returns -1 for this < that, 0 for this = that, and 1 for this > that,
     //and 2 for error
-    public int compareBigInt(BigInt that) {
+    int compareBigInt(BigInt that) {
         //only needs less than and equals to operators for C++ implementation
         //Cases for opposite signs
         if (this.positive && !that.positive) return 1;
         if (!this.positive && that.positive) return -1;
         //Cases for positive signs
-        if (this.positive && that.positive) {
+        if (this.positive) {
             //Cases of differing number of digits
             if (this.value.size() > that.value.size()) return 1;
             else if (this.value.size() < that.value.size()) return -1;
@@ -134,19 +131,18 @@ public class BigInt {
                 return 0;
             }
             //Cases for negative signs
-        }if (!this.positive && !that.positive) {
-            //Cases of differing number of digits
-            if (this.value.size() < that.value.size()) return 1;
-            else if (this.value.size() > that.value.size()) return -1;
-            else {
-                //Digit by digit comparison
-                for (int i = this.value.size() - 1; i >= 0; i--) {
-                    if (this.value.get(i) < that.value.get(i)) return 1;
-                    else if (this.value.get(i) > that.value.get(i)) return -1;
-                }
-                return 0;
+        }
+        //Cases of differing number of digits
+        if (this.value.size() < that.value.size()) return 1;
+        else if (this.value.size() > that.value.size()) return -1;
+        else {
+            //Digit by digit comparison
+            for (int i = this.value.size() - 1; i >= 0; i--) {
+                if (this.value.get(i) < that.value.get(i)) return 1;
+                else if (this.value.get(i) > that.value.get(i)) return -1;
             }
-        } else return 2;
+            return 0;
+        }
     }
 
     //Tests expression (|this| > |that|)
@@ -176,7 +172,7 @@ public class BigInt {
 
     //Externally called add method, runs sum method for largerInput.sum(smallerInput), compares
     //digit length first
-    public BigInt add(BigInt that) {
+    BigInt add(BigInt that) {
         //If a == b: a.multiply(2)
         if (this.compareBigInt(that) == 0) return this.uAdd(this);
         //If |a| == |b|: 0
@@ -200,17 +196,20 @@ public class BigInt {
     }
 
     //Externally called subtraction method operating on an int and a BigInt
-    public BigInt sub(BigInt that) {
+    BigInt sub(BigInt that) {
         return this.add(that.negCopy());
     }
 
     //Externally called multiplication method
     public BigInt multiply(int factor) {
-        return this;
+        return this.multiply(new BigInt(factor));
     }
 
     //Externally called multiplication method operating on two BigInts
     public BigInt multiply(BigInt that) {
-        return this;
+        if (this.positive == that.positive) {
+            //Same sign multiplication
+            return this.product(that);
+        } return (this.product(that)).negCopy();
     }
 }

@@ -4,10 +4,6 @@ import org.junit.Test;
 import static org.junit.Assert.*;
 import static andreikrainiouk.bigint.IntHelper.*;
 
-/**
- * Created by Andrei on 3/27/2016.
- */
-
 public class IntHelperTest {
     @Test
     public void testIntPow() {
@@ -26,7 +22,7 @@ public class IntHelperTest {
 
     @Test
     public void testNumDigits() {
-        assertEquals(0, numDigits(0));
+        assertEquals(1, numDigits(0));
         assertEquals(1, numDigits(1));
         assertEquals(2, numDigits(21));
         assertEquals(3, numDigits(333));
