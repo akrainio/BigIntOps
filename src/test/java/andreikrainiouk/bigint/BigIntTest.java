@@ -72,40 +72,40 @@ public class BigIntTest {
     public void testCompareBigInt() {
         BigInt num1 = new BigInt(0);
         BigInt num2 = new BigInt(0);
-        assertEquals(0, num1.compareBigInt(num2));
+        assertEquals(true, num1.equals(num2));
         num1 = new BigInt(1);
         num2 = new BigInt(0);
-        assertEquals(1, num1.compareBigInt(num2));
+        assertEquals(true, !num1.less(num2));
         num1 = new BigInt(0);
         num2 = new BigInt(1);
-        assertEquals(-1, num1.compareBigInt(num2));
+        assertEquals(true, num1.less(num2));
         num1 = new BigInt(10);
         num2 = new BigInt(1);
-        assertEquals(1, num1.compareBigInt(num2));
+        assertEquals(true, !num1.less(num2));
         num1 = new BigInt(1);
         num2 = new BigInt(10);
-        assertEquals(-1, num1.compareBigInt(num2));
+        assertEquals(true, num1.less(num2));
         num1 = new BigInt(-1);
         num2 = new BigInt(0);
-        assertEquals(-1, num1.compareBigInt(num2));
+        assertEquals(true, num1.less(num2));
         num1 = new BigInt(-1);
         num2 = new BigInt(-1);
-        assertEquals(0, num1.compareBigInt(num2));
+        assertEquals(true, num1.equals(num2));
         num1 = new BigInt(-1);
         num2 = new BigInt(-10);
-        assertEquals(1, num1.compareBigInt(num2));
+        assertEquals(true, !num1.less(num2));
         num1 = new BigInt(-10);
         num2 = new BigInt(-1);
-        assertEquals(-1, num1.compareBigInt(num2));
+        assertEquals(true, num1.less(num2));
         num1 = new BigInt(-10);
         num2 = new BigInt(10);
-        assertEquals(-1, num1.compareBigInt(num2));
+        assertEquals(true, num1.less(num2));
         num1 = new BigInt(10);
         num2 = new BigInt(-10);
-        assertEquals(1, num1.compareBigInt(num2));
+        assertEquals(true, !num1.less(num2));
         num1 = new BigInt(-9);
         num2 = new BigInt(-8);
-        assertEquals(-1, num1.compareBigInt(num2));
+        assertEquals(true, num1.less(num2));
     }
 
     @Test

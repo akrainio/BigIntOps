@@ -125,39 +125,21 @@ class BigInt {
 
     //Public Methods////////////////////////////////////////////////////////////////////////////////
 
-    //Compares 2 BigInts, returns -1 for this < that, 0 for this = that, and 1 for this > that,
-    //and 2 for error
-    int compareBigInt(BigInt that) {
-        //only needs less than and equals to operators for C++ implementation
-        //Cases for opposite signs
-        if (this.positive && !that.positive) return 1;
-        if (!this.positive && that.positive) return -1;
-        //Cases for positive signs
+    //Compares 2 BigInts, returns true if this < that
+    boolean less(BigInt that) {
+        if (this.positive && !that.positive) return false;
+        if (!this.positive && that.positive) return true;
         if (this.positive) {
-            //Cases of differing number of digits
-            if (this.value.size() > that.value.size()) return 1;
-            else if (this.value.size() < that.value.size()) return -1;
-            else {
-                //Digit by digit comparison
-                for (int i = this.value.size() - 1; i >= 0; --i) {
-                    if (this.value.get(i) > that.value.get(i)) return 1;
-                    else if (this.value.get(i) < that.value.get(i)) return -1;
-                }
-                return 0;
-            }
-            //Cases for negative signs
+            if (this.higherMagnitude(that)) return false;
+            else return true;
         }
-        //Cases of differing number of digits
-        if (this.value.size() < that.value.size()) return 1;
-        else if (this.value.size() > that.value.size()) return -1;
-        else {
-            //Digit by digit comparison
-            for (int i = this.value.size() - 1; i >= 0; i--) {
-                if (this.value.get(i) < that.value.get(i)) return 1;
-                else if (this.value.get(i) > that.value.get(i)) return -1;
-            }
-            return 0;
-        }
+        if (this.higherMagnitude(that)) return true;
+        else return false;
+    }
+
+    boolean equals(BigInt that) {
+        return !((this.positive && !that.positive) || (!this.positive && that.positive))
+                && !(this.higherMagnitude(that) || this.higherMagnitude(that));
     }
 
     //Tests expression (|this| > |that|)
@@ -189,9 +171,9 @@ class BigInt {
     //digit length first
     BigInt add(BigInt that) {
         //If a == b: a.multiply(2)
-        if (this.compareBigInt(that) == 0) return this.uAdd(this);
+        if (this.equals(that)) return this.uAdd(this);
         //If |a| == |b|: 0
-        if (this.compareBigInt(that.negCopy()) == 0) return new BigInt(0);
+        if (this.equals(that.negCopy())) return new BigInt(0);
         //If both pos: a.uAdd(b)
         if (this.positive && that.positive) return this.uAdd(that);
         //if both neg: -|a|.uAdd(|b|)
