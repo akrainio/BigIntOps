@@ -99,7 +99,22 @@ class BigInt {
 
     //Called by multiply, computes product of two positive BigInts
     private BigInt product(BigInt that) {
-        return that;
+        List<Integer> p = new ArrayList<Integer>();
+        //Initialize ArrayList of size m + n to 0;
+        for (int i = 0; i < this.value.size() + that.value.size(); ++i) {
+            p.add(0);
+        }
+        for (int i = 0; i < this.value.size(); ++i) {
+            int c = 0;
+            for (int j = 0; j < that.value.size(); ++j) {
+                int d = p.get(i + j) + this.value.get(i) * that.value.get(j) + c;
+                p.set(i + j, d % 10);
+                c = d / 10;
+            }
+            p.set(i + that.value.size(), c);
+        }
+        trim(p);
+        return new BigInt(p, true);
     }
     //Package private
 
