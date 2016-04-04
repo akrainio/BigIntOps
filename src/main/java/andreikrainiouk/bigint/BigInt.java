@@ -1,10 +1,7 @@
 package andreikrainiouk.bigint;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
-
-import static java.util.Collections.unmodifiableList;
 
 class BigInt {
 
@@ -12,9 +9,8 @@ class BigInt {
 
     //ArrayList representation of a natural number
     private final List<Integer> value;
+
     //Denotes sign
-
-
     private final boolean positive;
 
     //Constructors//////////////////////////////////////////////////////////////////////////////////
@@ -60,17 +56,10 @@ class BigInt {
         int carry = 0;
         List<Integer> total = new ArrayList<Integer>();
         for (int i = 0; i < this.value.size(); i++){
-            //When processing digits only in this
-            if (i >= that.value.size()) {
-                int sum = this.value.get(i) + carry;
-                total.add(sum % 10);
-                carry = sum / 10;
-            //When processing digits existing in both this and that
-            } else {
-                int sum = this.value.get(i) + that.value.get(i) + carry;
-                total.add(sum % 10);
-                carry = sum / 10;
-            }
+            int sum = this.value.get(i) + carry;
+            if (i < that.value.size()) sum += that.value.get(i);
+            total.add(sum % 10);
+            carry = sum / 10;
         }
         if (carry != 0) {
             assert (carry > 0);
@@ -125,7 +114,7 @@ class BigInt {
 
     //Public Methods////////////////////////////////////////////////////////////////////////////////
 
-    //Compares 2 BigInts, returns true if this < that
+    //Tests expression (this < that)
     boolean less(BigInt that) {
         if (this.positive && !that.positive) return false;
         if (!this.positive && that.positive) return true;
@@ -137,9 +126,9 @@ class BigInt {
         else return false;
     }
 
+    //Tests expression (this == that)
     boolean equals(BigInt that) {
-        return !((this.positive && !that.positive) || (!this.positive && that.positive))
-                && !(this.higherMagnitude(that) || this.higherMagnitude(that));
+        return (this.positive == that.positive) && (!this.higherMagnitude(that) && !that.higherMagnitude(this));
     }
 
     //Tests expression (|this| > |that|)

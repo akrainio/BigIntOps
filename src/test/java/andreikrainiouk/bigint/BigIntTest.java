@@ -69,12 +69,37 @@ public class BigIntTest {
     }
 
     @Test
-    public void testCompareBigInt() {
+    public void testEquals() {
         BigInt num1 = new BigInt(0);
         BigInt num2 = new BigInt(0);
         assertEquals(true, num1.equals(num2));
+        num1 = new BigInt(-1);
+        num2 = new BigInt(-1);
+        assertEquals(true, num1.equals(num2));
+        num1 = new BigInt(-1);
+        num2 = new BigInt(1);
+        assertEquals(false, num1.equals(num2));
+        num1 = new BigInt(1);
+        num2 = new BigInt(-1);
+        assertEquals(false, num1.equals(num2));
+        num1 = new BigInt(0);
+        num2 = new BigInt(-1);
+        assertEquals(false, num1.equals(num2));
+        num1 = new BigInt(-1);
+        num2 = new BigInt(0);
+        assertEquals(false, num1.equals(num2));
+        num1 = new BigInt(0);
+        num2 = new BigInt(1);
+        assertEquals(false, num1.equals(num2));
         num1 = new BigInt(1);
         num2 = new BigInt(0);
+        assertEquals(false, num1.equals(num2));
+    }
+
+    @Test
+    public void testLess() {
+        BigInt num1 = new BigInt(1);
+        BigInt num2 = new BigInt(0);
         assertEquals(true, !num1.less(num2));
         num1 = new BigInt(0);
         num2 = new BigInt(1);
@@ -88,9 +113,6 @@ public class BigIntTest {
         num1 = new BigInt(-1);
         num2 = new BigInt(0);
         assertEquals(true, num1.less(num2));
-        num1 = new BigInt(-1);
-        num2 = new BigInt(-1);
-        assertEquals(true, num1.equals(num2));
         num1 = new BigInt(-1);
         num2 = new BigInt(-10);
         assertEquals(true, !num1.less(num2));
